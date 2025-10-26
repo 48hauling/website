@@ -1,0 +1,5 @@
+# Ignore everything by default; then whitelist project files
+/*
+!/.gitignore
+!/README.md
+!/website/
