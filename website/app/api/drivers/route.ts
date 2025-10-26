@@ -30,6 +30,13 @@ export async function POST(req: Request) {
     // Generate PDF from application data
     const pdfBuffer = await generateApplicationPDF(payload);
 
+    // Check if email is configured
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+      console.warn("Email not configured - driver application logged but not emailed");
+      console.log("Driver application:", payload.firstName, payload.lastName);
+      return NextResponse.json({ ok: true, message: "Application logged (email not configured)" });
+    }
+
     // Create email transporter
     const transporter = nodemailer.createTransport({
       service: 'gmail',

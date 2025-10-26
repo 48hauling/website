@@ -3,8 +3,6 @@ import { Resend } from "resend";
 
 export const runtime = "nodejs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   try {
     const fd = await req.formData();
@@ -34,6 +32,15 @@ ${entries.notes || 'N/A'}
 
 ${photos.length > 0 ? `Photos attached: ${photos.length}` : 'No photos attached'}
     `.trim();
+
+    // Check if Resend API key is configured
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("RESEND_API_KEY not configured - quote request logged but not emailed");
+      console.log("Quote request data:", emailContent);
+      return NextResponse.json({ ok: true, message: "Quote logged (email not configured)" });
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     // Convert photos to attachments
     const attachments = await Promise.all(
